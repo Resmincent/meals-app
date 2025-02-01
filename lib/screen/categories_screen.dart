@@ -1,7 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/data/dummy_data.dart';
+import 'package:meals_app/models/category.dart';
+import 'package:meals_app/screen/meals_screen.dart';
+import 'package:meals_app/widgets/category_item.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
+
+  void _selectCategory(BuildContext context, Category category) {
+    final filteredMeals = dummyMeals
+        .where((meal) => meal.categories.contains(category.id))
+        .toList();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MealsScreen(
+          title: category.title,
+          meals: filteredMeals,
+        ),
+      ),
+    );
+  }
 
   AppBar _header() {
     return AppBar(
@@ -9,7 +28,7 @@ class CategoriesScreen extends StatelessWidget {
     );
   }
 
-  Widget _content() {
+  Widget _content(BuildContext context) {
     return GridView(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -17,12 +36,17 @@ class CategoriesScreen extends StatelessWidget {
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
       ),
-      children: const [
-        Text('1'),
-        Text('2'),
-        Text('3'),
-        Text('4'),
-        Text('5'),
+      children: [
+        // availableCategories
+        //     .map((category) => CategoryItem(category: category))
+        //     .toList(),
+        for (final category in availableCategories)
+          CategoryItem(
+            category: category,
+            onSelectCategory: () {
+              _selectCategory(context, category);
+            },
+          )
       ],
     );
   }
@@ -31,7 +55,7 @@ class CategoriesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _header(),
-      body: _content(),
+      body: _content(context),
     );
   }
 }
